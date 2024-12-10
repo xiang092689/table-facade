@@ -12,24 +12,18 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-name: java spotbugs
+name: license lint
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
-
 jobs:
-  java_spotbugs:
+  build:
+    name: license lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Maven Central Repository
-        uses: actions/setup-java@v4
+      - name: licenselint
+        uses: shoothzj/licenselint@main
         with:
-          java-version: '8'
-          distribution: 'temurin'
-      - name: spotbugs
-        run: mvn -B -DskipTests clean verify spotbugs:spotbugs
+          author: OpenFacade Authors
