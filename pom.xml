@@ -148,7 +148,11 @@
                     <execution>
                         <id>report</id>
                         <configuration>
-                            <excludes>**/META-INF/versions/**</excludes>
+                            <excludes>
+                                <exclude>
+                                    **/META-INF/versions/**
+                                </exclude>
+                            </excludes>
                         </configuration>
                         <phase>validate</phase>
                         <goals>

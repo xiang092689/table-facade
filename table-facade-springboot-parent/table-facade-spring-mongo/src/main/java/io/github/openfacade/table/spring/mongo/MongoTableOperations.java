@@ -16,22 +16,47 @@
 
 package io.github.openfacade.table.spring.mongo;
 
+import io.github.openfacade.table.api.Condition;
 import io.github.openfacade.table.api.TableException;
 import io.github.openfacade.table.api.TableOperations;
 
+import java.util.List;
+
 public class MongoTableOperations implements TableOperations {
+
+    @Override
+    public <T> T insert(T object) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long update(Condition condition, Object[] pairs, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T find(Condition condition, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> List<T> findAll(Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long delete(Condition condition, Class<T> type) throws TableException {
+        throw new UnsupportedOperationException();
+    }
+
     @Override
     public <T> Long deleteAll(Class<T> type) throws TableException {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Long deleteAll(String tableName) throws TableException {
+    public <T> Long count(Class<T> type) throws TableException {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public Long count(String tableName) throws TableException {
-        throw new UnsupportedOperationException();
-    }
 }

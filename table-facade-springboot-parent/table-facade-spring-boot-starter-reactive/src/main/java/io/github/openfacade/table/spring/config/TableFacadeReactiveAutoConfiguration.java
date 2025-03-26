@@ -17,9 +17,12 @@
 package io.github.openfacade.table.spring.config;
 
 import io.github.openfacade.table.api.DriverType;
+import io.github.openfacade.table.api.TableOperations;
 import io.github.openfacade.table.reactive.api.ReactiveTableManagement;
 import io.github.openfacade.table.reactive.api.ReactiveTableOperations;
 import io.github.openfacade.table.spring.core.TableFacadeProperties;
+import io.github.openfacade.table.spring.mysql.MysqlTableOperations;
+import io.github.openfacade.table.spring.opengauss.OpenGaussTableOperations;
 import io.github.openfacade.table.spring.reactive.mysql.ReactiveMysqlTableManagement;
 import io.github.openfacade.table.spring.reactive.mysql.ReactiveMysqlTableOperations;
 import io.github.openfacade.table.spring.reactive.opengauss.ReactiveOpenGaussTableManagement;
@@ -62,4 +65,15 @@ public class TableFacadeReactiveAutoConfiguration {
             return new ReactiveMysqlTableManagement(databaseClient);
         }
     }
+
+    @Bean
+    public TableOperations tableOperations(ReactiveTableOperations tableOperations) {
+        if (tableOperations instanceof ReactiveOpenGaussTableOperations) {
+            return new OpenGaussTableOperations((ReactiveOpenGaussTableOperations) tableOperations);
+        } else if (tableOperations instanceof ReactiveMysqlTableOperations){
+            return new MysqlTableOperations((ReactiveMysqlTableOperations) tableOperations);
+        }
+        return null;
+    }
+
 }

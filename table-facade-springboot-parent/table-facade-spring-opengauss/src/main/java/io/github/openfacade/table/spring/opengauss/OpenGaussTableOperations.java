@@ -16,22 +16,56 @@
 
 package io.github.openfacade.table.spring.opengauss;
 
+import io.github.openfacade.table.api.Condition;
 import io.github.openfacade.table.api.TableException;
 import io.github.openfacade.table.api.TableOperations;
+import io.github.openfacade.table.spring.core.ReactiveBaseTableOperations;
+import io.github.openfacade.table.spring.core.TableOperationSyncWrapper;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class OpenGaussTableOperations implements TableOperations {
+
+    final TableOperations wrapper;
+
+    public OpenGaussTableOperations(ReactiveBaseTableOperations reactiveBaseTableOperations) {
+        this.wrapper = new TableOperationSyncWrapper(reactiveBaseTableOperations);
+    }
+
+    @Override
+    public <T> T insert(T object) {
+        return wrapper.insert(object);
+    }
+
+    @Override
+    public <T> Long update(Condition condition, Object[] pairs, Class<T> type) {
+        return wrapper.update(condition, pairs, type);
+    }
+
+    @Override
+    public <T> T find(Condition condition, Class<T> type) {
+        return wrapper.find(condition, type);
+    }
+
+    @Override
+    public <T> List<T> findAll(Class<T> type) {
+        return wrapper.findAll(type);
+    }
+
     @Override
     public <T> Long deleteAll(Class<T> type) throws TableException {
-        throw new UnsupportedOperationException();
+        return wrapper.deleteAll(type);
     }
 
     @Override
-    public Long deleteAll(String tableName) throws TableException {
-        throw new UnsupportedOperationException();
+    public <T> Long delete(Condition condition, Class<T> type) throws TableException {
+        return wrapper.delete(condition, type);
     }
 
     @Override
-    public Long count(String tableName) throws TableException {
-        throw new UnsupportedOperationException();
+    public <T> Long count(Class<T> type) throws TableException {
+        return wrapper.count(type);
     }
 }

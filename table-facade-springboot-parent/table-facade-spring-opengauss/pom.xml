@@ -28,9 +28,15 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.opengauss</groupId>
-            <artifactId>opengauss-jdbc</artifactId>
-            <version>${opengauss.version}</version>
+            <groupId>io.github.openfacade</groupId>
+            <artifactId>table-facade-spring-reactive-opengauss</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.github.openfacade</groupId>
+            <artifactId>table-facade-spring-test-common</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 

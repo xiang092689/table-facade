@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-package io.github.openfacade.table.api;
+import io.github.openfacade.table.api.anno.Column;
+import io.github.openfacade.table.api.anno.Table;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
+@Setter
+@Getter
+@Table(name = "test_entity")
+public class TestOpenGaussEntity {
+    @Column(name = "id")
+    private Long id;
 
-public interface TableOperations {
-    <T> T insert(T object);
+    @Column(name = "tinyint_boolean_field")
+    private boolean tinyintBooleanField;
 
-    <T> Long update(Condition condition, Object[] pairs, Class<T> type);
+    @Column(name = "blob_bytes_field")
+    private byte[] blobBytesField;
 
-    <T> T find(Condition condition, Class<T> type);
-
-    <T> List<T> findAll(Class<T> type);
-
-    <T> Long delete(Condition condition, Class<T> type) throws TableException;
-
-    <T> Long deleteAll(Class<T> type) throws TableException;
-
-    <T> Long count(Class<T> type) throws TableException;
+    @Column(name = "varchar_string_field")
+    private String varcharStringField;
 }

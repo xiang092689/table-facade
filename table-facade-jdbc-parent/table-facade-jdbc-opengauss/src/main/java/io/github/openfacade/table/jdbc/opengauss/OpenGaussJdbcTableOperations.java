@@ -16,6 +16,7 @@
 
 package io.github.openfacade.table.jdbc.opengauss;
 
+import io.github.openfacade.table.api.Condition;
 import io.github.openfacade.table.api.TableException;
 import io.github.openfacade.table.api.TableOperations;
 import io.github.openfacade.table.sql.mysql.MysqlSqlUtil;
@@ -25,6 +26,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import javax.sql.DataSource;
 
 @RequiredArgsConstructor
@@ -32,13 +34,33 @@ public class OpenGaussJdbcTableOperations implements TableOperations {
     private final DataSource dataSource;
 
     @Override
+    public <T> T insert(T object) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long update(Condition condition, Object[] pairs, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T find(Condition condition, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> List<T> findAll(Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long delete(Condition condition, Class<T> type) throws TableException {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public <T> Long deleteAll(Class<T> type) throws TableException {
-        io.github.openfacade.table.api.anno.Table tableAnnotation = type.getAnnotation(io.github.openfacade.table.api.anno.Table.class);
-        if (tableAnnotation == null || tableAnnotation.name().isEmpty()) {
-            throw new TableException("Class " + type.getName() + " does not have a Table annotation with a valid name.");
-        }
-
-        String tableName = tableAnnotation.name();
+        String tableName = getTableName(type);
         String sql = MysqlSqlUtil.deleteAll(tableName);
 
         try (Connection connection = dataSource.getConnection();
@@ -51,22 +73,9 @@ public class OpenGaussJdbcTableOperations implements TableOperations {
     }
 
     @Override
-    public Long deleteAll(String tableName) throws TableException {
-        String sql = MysqlSqlUtil.deleteAll(tableName);
-
-        try (Connection connection = dataSource.getConnection();
-             Statement stmt = connection.createStatement()) {
-            int rowsAffected = stmt.executeUpdate(sql);
-            return (long) rowsAffected;
-        } catch (SQLException e) {
-            throw new TableException("Failed to delete all records from table " + tableName, e);
-        }
-    }
-
-    @Override
-    public Long count(String tableName) throws TableException {
+    public <T> Long count(Class<T> type) throws TableException {
+        String tableName = getTableName(type);
         String sql = MysqlSqlUtil.count(tableName);
-
         try (Connection connection = dataSource.getConnection();
              Statement stmt = connection.createStatement()) {
             stmt.execute(sql);
@@ -76,5 +85,14 @@ public class OpenGaussJdbcTableOperations implements TableOperations {
         } catch (SQLException e) {
             throw new TableException("Failed to count records in table " + tableName, e);
         }
+    }
+
+    private <T> String getTableName(Class<T> type) throws TableException {
+        io.github.openfacade.table.api.anno.Table tableAnnotation = type.getAnnotation(io.github.openfacade.table.api.anno.Table.class);
+        if (tableAnnotation == null || tableAnnotation.name().isEmpty()) {
+            throw new TableException("Class " + type.getName() + " does not have a Table annotation with a valid name.");
+        }
+
+        return tableAnnotation.name();
     }
 }

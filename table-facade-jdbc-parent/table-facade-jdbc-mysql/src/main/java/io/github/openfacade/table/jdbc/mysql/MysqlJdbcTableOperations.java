@@ -16,6 +16,7 @@
 
 package io.github.openfacade.table.jdbc.mysql;
 
+import io.github.openfacade.table.api.Condition;
 import io.github.openfacade.table.api.TableException;
 import io.github.openfacade.table.api.TableOperations;
 import io.github.openfacade.table.sql.mysql.MysqlSqlUtil;
@@ -24,11 +25,37 @@ import lombok.RequiredArgsConstructor;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
 import javax.sql.DataSource;
 
 @RequiredArgsConstructor
 public class MysqlJdbcTableOperations implements TableOperations {
     private final DataSource dataSource;
+
+    @Override
+    public <T> T insert(T object) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long update(Condition condition, Object[] pairs, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> T find(Condition condition, Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> List<T> findAll(Class<T> type) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public <T> Long delete(Condition condition, Class<T> type) throws TableException {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public <T> Long deleteAll(Class<T> type) throws TableException {
@@ -50,12 +77,7 @@ public class MysqlJdbcTableOperations implements TableOperations {
     }
 
     @Override
-    public Long deleteAll(String tableName) throws TableException {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public Long count(String tableName) throws TableException {
+    public <T> Long count(Class<T> type) throws TableException {
         throw new UnsupportedOperationException();
     }
 }
