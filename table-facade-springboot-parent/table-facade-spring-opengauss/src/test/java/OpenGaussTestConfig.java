@@ -22,10 +22,9 @@ import io.r2dbc.spi.ConnectionFactoryOptions;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.r2dbc.core.DatabaseClient;
-import org.testcontainers.junit.jupiter.Container;
 
-public class OpenGausslTestConfig extends TestConfig {
-    @Container
+public class OpenGaussTestConfig extends TestConfig {
+
     private static final OpenGaussContainer openGaussContainer = new OpenGaussContainer().withCompatibility("B");
 
     @Bean

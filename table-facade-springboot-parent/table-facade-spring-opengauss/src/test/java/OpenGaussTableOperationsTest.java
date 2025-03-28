@@ -33,7 +33,7 @@ import java.util.List;
 
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@SpringBootTest(classes = OpenGausslTestConfig.class)
+@SpringBootTest(classes = OpenGaussTestConfig.class)
 public class OpenGaussTableOperationsTest {
 
     @Autowired
