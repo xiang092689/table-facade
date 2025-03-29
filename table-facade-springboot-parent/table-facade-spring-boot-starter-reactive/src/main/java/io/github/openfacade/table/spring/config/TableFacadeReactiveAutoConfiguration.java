@@ -67,6 +67,7 @@ public class TableFacadeReactiveAutoConfiguration {
     }
 
     @Bean
+    @ConditionalOnMissingBean(TableOperations.class)
     public TableOperations tableOperations(ReactiveTableOperations tableOperations) {
         if (tableOperations instanceof ReactiveOpenGaussTableOperations) {
             return new OpenGaussTableOperations((ReactiveOpenGaussTableOperations) tableOperations);

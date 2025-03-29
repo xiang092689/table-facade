@@ -28,14 +28,8 @@
 
     <dependencies>
         <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java</artifactId>
-            <version>${docker-java.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.docker-java</groupId>
-            <artifactId>docker-java-api</artifactId>
-            <version>${docker-java.version}</version>
+            <groupId>org.testcontainers</groupId>
+            <artifactId>junit-jupiter</artifactId>
         </dependency>
     </dependencies>
 

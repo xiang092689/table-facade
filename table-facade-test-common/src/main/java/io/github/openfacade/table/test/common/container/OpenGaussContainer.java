@@ -22,16 +22,23 @@ import com.github.dockerjava.api.command.PullImageResultCallback;
 import com.github.dockerjava.api.model.ExposedPort;
 import com.github.dockerjava.api.model.Ports;
 import com.github.dockerjava.api.model.PullResponseItem;
-import com.github.dockerjava.core.DockerClientBuilder;
+import com.github.dockerjava.transport.DockerHttpClient;
+import com.github.dockerjava.zerodep.ZerodepDockerHttpClient;
 import lombok.Getter;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.testcontainers.shaded.com.github.dockerjava.core.DefaultDockerClientConfig;
+import org.testcontainers.shaded.com.github.dockerjava.core.DockerClientConfig;
+import org.testcontainers.shaded.com.github.dockerjava.core.DockerClientImpl;
 
+import java.time.Duration;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.dockerjava.api.model.HostConfig.newHostConfig;
 
+@Slf4j
 public class OpenGaussContainer {
 
     @Getter
@@ -72,9 +79,18 @@ public class OpenGaussContainer {
     private final static String defaultPassword = "Test@123";
 
     public OpenGaussContainer() {
-        DockerClient dockerClient = DockerClientBuilder.getInstance().build();
-        dockerClient.infoCmd().exec();
-        this.dockerClient = dockerClient;
+        DockerClientConfig config = DefaultDockerClientConfig.createDefaultConfigBuilder()
+                .build();
+
+        DockerHttpClient httpClient = new ZerodepDockerHttpClient.Builder()
+                .dockerHost(config.getDockerHost())
+                .sslConfig(config.getSSLConfig())
+                .maxConnections(100)
+                .connectionTimeout(Duration.ofSeconds(30))
+                .responseTimeout(Duration.ofSeconds(45))
+                .build();
+
+        dockerClient = DockerClientImpl.getInstance(config, httpClient);
         this.username = defaultUserName;
         this.password = defaultPassword;
         this.databaseName = defaultDatabaseName;
@@ -132,11 +148,13 @@ public class OpenGaussContainer {
         this.response = Optional.of(containerResponse);
         dockerClient.startContainerCmd(containerResponse.getId()).exec();
         TimeUnit.MINUTES.sleep(1);
+        log.info("gauss container started");
     }
 
     public void stopContainer() {
         response.ifPresent(resp -> dockerClient.stopContainerCmd(resp.getId()).exec());
         response.ifPresent(resp -> dockerClient.removeContainerCmd(resp.getId()).exec());
+        log.info("gauss container stopped");
     }
 
 }

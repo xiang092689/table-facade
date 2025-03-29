@@ -16,16 +16,32 @@
 
 import io.github.openfacade.table.spring.test.common.TestConfig;
 import io.github.openfacade.table.test.common.container.OpenGaussContainer;
+import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
+import io.r2dbc.postgresql.PostgresqlConnectionFactory;
+import io.r2dbc.postgresql.api.PostgresqlConnection;
 import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
 import io.r2dbc.spi.ConnectionFactoryOptions;
+import io.r2dbc.spi.Option;
+import jakarta.annotation.PreDestroy;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.r2dbc.core.DatabaseClient;
+import org.testcontainers.junit.jupiter.Container;
 
+@Slf4j
 public class OpenGaussTestConfig extends TestConfig {
 
-    private static final OpenGaussContainer openGaussContainer = new OpenGaussContainer().withCompatibility("B");
+    public static final int CONNECTION_RETRY_TIMEOUT =  5 * 60 * 1000;
+
+    public static final int CONNECTION_RETRY_INTERVAL = 5 * 1000;
+
+    public static final int MAX_CONNECTION_RETRY =  CONNECTION_RETRY_TIMEOUT / CONNECTION_RETRY_INTERVAL;
+
+    @Container
+    OpenGaussContainer openGaussContainer;
 
     @Bean
     public DatabaseClient databaseClient(ConnectionFactory connectionFactory) {
@@ -33,27 +49,57 @@ public class OpenGaussTestConfig extends TestConfig {
     }
 
     @Bean
-    public ConnectionFactory connectionFactory(R2dbcProperties r2dbcProperties) {
-        ConnectionFactoryOptions options = ConnectionFactoryOptions.builder()
-                .option(ConnectionFactoryOptions.DRIVER, "postgresql")
-                .option(ConnectionFactoryOptions.HOST, "localhost")
-                .option(ConnectionFactoryOptions.PORT, 5432)
-                .option(ConnectionFactoryOptions.USER, openGaussContainer.getUsername())
-                .option(ConnectionFactoryOptions.PASSWORD, openGaussContainer.getPassword())
-                .option(ConnectionFactoryOptions.DATABASE, openGaussContainer.getDatabaseName())
-                .option(ConnectionFactoryOptions.SSL, false)
-                .build();
-        return ConnectionFactories.get(options);
+    public ConnectionFactory connectionFactory(OpenGaussContainer openGaussContainer, R2dbcProperties r2dbcProperties) throws InterruptedException {
+        PostgresqlConnectionFactory pgConnectionFactory = new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
+                .host("localhost")
+                .port(5432)  // optional, defaults to 5432
+                .username(openGaussContainer.getUsername())
+                .password(openGaussContainer.getPassword())
+                .database(openGaussContainer.getDatabaseName())
+                .schema(openGaussContainer.getSchema())
+                .build());
+        // wait for container available
+        int retries = 0;
+        boolean connected = false;
+        while (!connected) {
+            try {
+                pgConnectionFactory.create().block();
+                connected = true;
+            } catch (Exception e) {
+                if (retries >= MAX_CONNECTION_RETRY) {
+                    throw e;
+                }
+                retries++;
+                log.warn("connect openGauss failed, retry {}/{}", retries, MAX_CONNECTION_RETRY);
+                Thread.sleep(6 * 1000);
+            }
+        }
+        log.info("OpenGauss is available now");
+        return pgConnectionFactory;
     }
 
     @Bean
-    public R2dbcProperties r2dbcProperties() {
+    public OpenGaussContainer openGaussContainer() {
+        openGaussContainer = new OpenGaussContainer().withCompatibility("B");
         openGaussContainer.startContainer();
-        String url = String.format("jdbc:postgresql://localhost:5432/%s?currentSchema=%s", openGaussContainer.getDatabaseName(), openGaussContainer.getSchema());
+        return openGaussContainer;
+    }
+
+    @Bean
+    public R2dbcProperties r2dbcProperties(OpenGaussContainer openGaussContainer) {
+        String url = String.format("r2dbc:postgresql://localhost:5432/%s?currentSchema=%s",
+                openGaussContainer.getDatabaseName(), openGaussContainer.getSchema());
         R2dbcProperties properties = new R2dbcProperties();
         properties.setUrl(url);
         properties.setUsername(openGaussContainer.getUsername());
         properties.setPassword(openGaussContainer.getPassword());
         return properties;
+    }
+
+    @PreDestroy
+    public void gracefullyExit() {
+        if (openGaussContainer != null) {
+            openGaussContainer.stopContainer();
+        }
     }
 }
