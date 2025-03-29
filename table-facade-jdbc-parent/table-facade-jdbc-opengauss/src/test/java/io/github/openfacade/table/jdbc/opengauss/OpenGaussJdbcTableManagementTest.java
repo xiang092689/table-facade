@@ -41,7 +41,7 @@ class OpenGaussJdbcTableManagementTest {
     private static DataSource dataSource;
 
     private OpenGaussJdbcTableManagement tableManagement;
-    private static String jdbcUrl = "jdbc:postgresql://localhost:5432/%s?currentSchema=%s";
+    private static String jdbcUrl = "jdbc:postgresql://localhost:35432/%s?currentSchema=%s";
     private static String openGaussDriver = "org.postgresql.Driver";
 
     private static OpenGaussContainer container;

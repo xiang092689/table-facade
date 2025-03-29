@@ -128,7 +128,7 @@ public class OpenGaussContainer {
         String[] envs = new String[]{"USER_NAME=" + username, "USER_PASSWORD=" + password, "PASSWORD=" + password,
                 "CUSTOM_DATABASE=" + databaseName, "CUSTOM_DATABASE_DBCOMPATIBILITY=" + compatibility,
                 "CUSTOM_SCHEMA=" + schema};
-        ExposedPort tcp5432 = ExposedPort.tcp(5432);
+        ExposedPort tcp5432 = ExposedPort.tcp(35432);
         Ports portBindings = new Ports();
         portBindings.bind(tcp5432, Ports.Binding.bindPort(5432));
         dockerClient.pullImageCmd(imageRepository).withTag(imageTag).exec(new PullImageResultCallback() {

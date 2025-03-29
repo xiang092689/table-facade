@@ -18,14 +18,9 @@ import io.github.openfacade.table.spring.test.common.TestConfig;
 import io.github.openfacade.table.test.common.container.OpenGaussContainer;
 import io.r2dbc.postgresql.PostgresqlConnectionConfiguration;
 import io.r2dbc.postgresql.PostgresqlConnectionFactory;
-import io.r2dbc.postgresql.api.PostgresqlConnection;
-import io.r2dbc.spi.ConnectionFactories;
 import io.r2dbc.spi.ConnectionFactory;
-import io.r2dbc.spi.ConnectionFactoryOptions;
-import io.r2dbc.spi.Option;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.autoconfigure.r2dbc.R2dbcProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.r2dbc.core.DatabaseClient;
@@ -52,7 +47,7 @@ public class OpenGaussTestConfig extends TestConfig {
     public ConnectionFactory connectionFactory(OpenGaussContainer openGaussContainer, R2dbcProperties r2dbcProperties) throws InterruptedException {
         PostgresqlConnectionFactory pgConnectionFactory = new PostgresqlConnectionFactory(PostgresqlConnectionConfiguration.builder()
                 .host("localhost")
-                .port(5432)  // optional, defaults to 5432
+                .port(35432)  // optional, defaults to 5432
                 .username(openGaussContainer.getUsername())
                 .password(openGaussContainer.getPassword())
                 .database(openGaussContainer.getDatabaseName())
@@ -87,7 +82,7 @@ public class OpenGaussTestConfig extends TestConfig {
 
     @Bean
     public R2dbcProperties r2dbcProperties(OpenGaussContainer openGaussContainer) {
-        String url = String.format("r2dbc:postgresql://localhost:5432/%s?currentSchema=%s",
+        String url = String.format("r2dbc:postgresql://localhost:35432/%s?currentSchema=%s",
                 openGaussContainer.getDatabaseName(), openGaussContainer.getSchema());
         R2dbcProperties properties = new R2dbcProperties();
         properties.setUrl(url);
@@ -98,8 +93,8 @@ public class OpenGaussTestConfig extends TestConfig {
 
     @PreDestroy
     public void gracefullyExit() {
-        if (openGaussContainer != null) {
-            openGaussContainer.stopContainer();
-        }
+//        if (openGaussContainer != null) {
+//            openGaussContainer.stopContainer();
+//        }
     }
 }
